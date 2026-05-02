@@ -164,8 +164,10 @@ def create_task(
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
     
-    if current_user.role != models.UserRole.ADMIN and current_user not in project.members:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    if current_user.role != models.UserRole.ADMIN and \
+       current_user.id != project.owner_id and \
+       current_user.id not in [m.id for m in project.members]:
+        raise HTTPException(status_code=403, detail="Not enough permissions to create tasks in this project")
 
     db_task = models.Task(**task.dict())
     db.add(db_task)
