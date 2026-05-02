@@ -90,45 +90,57 @@ const Tasks = () => {
       reminder_date: (newTask.reminder_date && !isNaN(new Date(newTask.reminder_date).getTime())) ? new Date(newTask.reminder_date).toISOString() : null
     };
 
-    const res = await fetch('/tasks/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify(payload)
-    });
-    
-    if (res.ok) {
-      const createdTask = await res.json();
+    try {
+      const res = await fetch('/tasks/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(payload)
+      });
       
-      // Upload temp subtasks
-      for (const st of tempSubtasks) {
-        await fetch(`/tasks/${createdTask.id}/subtasks`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-          body: JSON.stringify({ title: st.title, is_completed: st.is_completed })
-        });
-      }
+      if (res.ok) {
+        const createdTask = await res.json();
+        
+        // Upload temp subtasks
+        for (const st of tempSubtasks) {
+          await fetch(`/tasks/${createdTask.id}/subtasks`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ title: st.title, is_completed: st.is_completed })
+          });
+        }
 
-      // Upload temp files
-      for (const file of tempFiles) {
-        const formData = new FormData();
-        formData.append('file', file);
-        await fetch(`/tasks/${createdTask.id}/attachments`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` },
-          body: formData
-        });
-      }
+        // Upload temp files
+        for (const file of tempFiles) {
+          const formData = new FormData();
+          formData.append('file', file);
+          await fetch(`/tasks/${createdTask.id}/attachments`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+          });
+        }
 
-      setNewTask({ title: '', description: '', assignee_id: '', due_date: '', reminder_date: '', project_id: '' });
-      setTempSubtasks([]);
-      setTempFiles([]);
-      setShowAddModal(false);
-      setShowChecklistInput(false);
-      setShowReminderInput(false);
-      fetchTasks();
-    } else {
-      const err = await res.json();
-      alert('Error creating task: ' + JSON.stringify(err.detail || err));
+        setNewTask({ title: '', description: '', assignee_id: '', due_date: '', reminder_date: '', project_id: '' });
+        setTempSubtasks([]);
+        setTempFiles([]);
+        setShowAddModal(false);
+        setShowChecklistInput(false);
+        setShowReminderInput(false);
+        fetchTasks();
+      } else {
+        const errorText = await res.text();
+        let errorMessage = errorText;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.detail || JSON.stringify(errorJson);
+        } catch (e) {
+          // Not JSON
+        }
+        alert('Server Error (' + res.status + '): ' + errorMessage);
+      }
+    } catch (err) {
+      console.error('Network or App Error:', err);
+      alert('Error: Could not connect to server or application crashed. ' + err.message);
     }
   };
 
