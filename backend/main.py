@@ -345,7 +345,7 @@ def get_stats(db: Session = Depends(get_db), current_user: models.User = Depends
         "todo": len([t for t in tasks if t.status == "todo"]),
         "in_progress": len([t for t in tasks if t.status == "in_progress"]),
         "completed": len([t for t in tasks if t.status == "completed"]),
-        "overdue": len([t for t in tasks if t.due_date and t.due_date < datetime.utcnow() and t.status != "completed"])
+        "overdue": len([t for t in tasks if t.due_date and t.due_date < datetime.datetime.utcnow() and t.status != "completed"])
     }
     return stats
 
