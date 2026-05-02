@@ -27,6 +27,8 @@ const Tasks = () => {
   const fileInputRef = useRef(null);
   const detailFileInputRef = useRef(null);
 
+  const [isCreating, setIsCreating] = useState(false);
+  
   // Pagination
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -75,6 +77,7 @@ const Tasks = () => {
   const handleCreateTask = async (e) => {
     e.preventDefault();
     if (!newTask.title.trim()) return;
+    setIsCreating(true);
 
     const token = localStorage.getItem('token');
     const projectId = newTask.project_id || (projects?.length > 0 ? projects[0].id : 1);
@@ -141,6 +144,8 @@ const Tasks = () => {
     } catch (err) {
       console.error('Network or App Error:', err);
       alert('Error: Could not connect to server or application crashed. ' + err.message);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -723,8 +728,13 @@ const Tasks = () => {
 
             {/* Modal Footer */}
             <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '12px', alignItems: 'center', background: 'rgba(0,0,0,0.2)' }}>
-              <button className="btn-primary" style={{ padding: '8px 24px' }} onClick={handleCreateTask}>
-                Create
+              <button 
+                className="btn-primary" 
+                style={{ padding: '8px 24px', opacity: isCreating ? 0.7 : 1, cursor: isCreating ? 'not-allowed' : 'pointer' }} 
+                onClick={handleCreateTask}
+                disabled={isCreating}
+              >
+                {isCreating ? 'Creating...' : 'Create'}
               </button>
               <button className="btn-secondary" style={{ padding: '8px 24px', border: 'none', background: 'transparent' }} onClick={() => setShowAddModal(false)}>
                 Cancel
