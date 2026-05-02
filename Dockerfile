@@ -1,5 +1,5 @@
 # Use Node 22 for Vite 6+ support
-FROM node:22-alpine AS frontend-build
+FROM node:22.12-alpine AS frontend-build
 WORKDIR /frontend
 COPY frontend/package*.json ./
 RUN npm install
