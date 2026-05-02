@@ -349,10 +349,13 @@ def get_stats(db: Session = Depends(get_db), current_user: models.User = Depends
 
 # Serve Static Files (React) - Only if directory exists (for Docker/Production)
 if os.path.exists("static"):
-    app.mount("/static", StaticFiles(directory="static"), name="static")
-
     @app.get("/{full_path:path}")
     async def serve_react_app(full_path: str):
+        # Check if the requested file exists in the static folder (e.g. assets/index.js)
+        file_path = os.path.join("static", full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+        # Otherwise, serve index.html for SPA routing
         return FileResponse("static/index.html")
 else:
     @app.get("/")
