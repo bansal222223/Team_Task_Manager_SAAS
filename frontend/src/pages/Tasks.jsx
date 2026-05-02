@@ -86,8 +86,8 @@ const Tasks = () => {
       project_id: parseInt(projectId),
       assignee_id: parseInt(assigneeId),
       priority: 'medium',
-      due_date: newTask.due_date ? new Date(newTask.due_date).toISOString() : null,
-      reminder_date: newTask.reminder_date ? new Date(newTask.reminder_date).toISOString() : null
+      due_date: (newTask.due_date && !isNaN(new Date(newTask.due_date).getTime())) ? new Date(newTask.due_date).toISOString() : null,
+      reminder_date: (newTask.reminder_date && !isNaN(new Date(newTask.reminder_date).getTime())) ? new Date(newTask.reminder_date).toISOString() : null
     };
 
     const res = await fetch('/tasks/', {
