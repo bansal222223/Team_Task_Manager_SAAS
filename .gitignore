@@ -1,0 +1,29 @@
+# Node modules
+node_modules/
+dist/
+build/
+.npm
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+
+# Database
+*.db
+*.sqlite3
+sql_app.db
+
+# Environment variables
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# User Uploads
+backend/uploads/
